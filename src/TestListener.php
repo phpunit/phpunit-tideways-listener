@@ -14,15 +14,26 @@ use PHPUnit\Framework\TestListener as TestListenerInterface;
 use PHPUnit\Framework\TestListenerDefaultImplementation;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestSuite;
 
 final class TestListener implements TestListenerInterface
 {
     use TestListenerDefaultImplementation;
 
     /**
+     * @var ProfileCollection
+     */
+    private $profiles;
+
+    /**
      * @var string
      */
     private $targetDirectory;
+
+    /**
+     * @var int
+     */
+    private $testSuites = 0;
 
     /**
      * @throws InvalidTargetDirectoryException
@@ -34,6 +45,24 @@ final class TestListener implements TestListenerInterface
         $this->ensureProfilerIsAvailable();
 
         $this->targetDirectory = $targetDirectory;
+        $this->profiles        = new ProfileCollection;
+    }
+
+    public function startTestSuite(TestSuite $suite): void
+    {
+        $this->testSuites++;
+    }
+
+    public function endTestSuite(TestSuite $suite): void
+    {
+        $this->testSuites--;
+
+        if ($this->testSuites === 0) {
+            \file_put_contents(
+                $this->targetDirectory . \DIRECTORY_SEPARATOR . \uniqid('phpunit_tideways_'),
+                \serialize($this->profiles)
+            );
+        }
     }
 
     public function startTest(Test $test)
@@ -51,23 +80,14 @@ final class TestListener implements TestListenerInterface
             return;
         }
 
-        $data = \tideways_xhprof_disable();
-
-        \file_put_contents(
-            $this->targetDirectory . DIRECTORY_SEPARATOR . $this->fileName($test),
-            \serialize($data)
+        $this->profiles->add(
+            new Profile(
+                \get_class($test),
+                $test->getName(false),
+                $test->dataDescription(),
+                \tideways_xhprof_disable()
+            )
         );
-    }
-
-    private function fileName(TestCase $test): string
-    {
-        $id = \str_replace('\\', '_', \get_class($test)) . '::' . $test->getName(false);
-
-        if (!empty($test->dataDescription())) {
-            $id .= '#' . \str_replace(' ', '_', $test->dataDescription());
-        }
-
-        return $id . '.xhprof';
     }
 
     /**
