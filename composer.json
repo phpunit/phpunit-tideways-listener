@@ -1,0 +1,31 @@
+{
+  "name": "phpunit/phpunit-tideways-listener",
+  "description": "TestListener for PHPUnit that can dump profile information",
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Sebastian Bergmann",
+      "email": "sebastian@phpunit.de",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/sebastianbergmann/phpunit-tideways-listener/issues"
+  },
+  "require": {
+    "php": "^7.1",
+    "ext-tideways_xhprof": "*",
+    "phpunit/phpunit": "^6"
+  },
+  "autoload": {
+    "classmap": [
+      "src/"
+    ]
+  },
+  "extra": {
+    "branch-alias": {
+        "dev-master": "1.0-dev"
+    }
+  }
+}
+
