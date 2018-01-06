@@ -36,7 +36,6 @@ The example below shows how you activate and configure this test listener in you
         <listener class="PHPUnit\Tideways\TestListener">
             <arguments>
                 <string>/tmp</string>
-                <string>callgrind</string>
             </arguments>
         </listener>
     </listeners>
