@@ -10,10 +10,10 @@
 
 namespace PHPUnit\Tideways;
 
-use PHPUnit\Framework\TestListener as TestListenerInterface;
-use PHPUnit\Framework\TestListenerDefaultImplementation;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestListener as TestListenerInterface;
+use PHPUnit\Framework\TestListenerDefaultImplementation;
 use PHPUnit\Framework\TestSuite;
 
 final class TestListener implements TestListenerInterface
@@ -78,7 +78,7 @@ final class TestListener implements TestListenerInterface
         }
     }
 
-    public function startTest(Test $test)
+    public function startTest(Test $test): void
     {
         if (!$test instanceof TestCase) {
             return;
@@ -87,7 +87,7 @@ final class TestListener implements TestListenerInterface
         \tideways_xhprof_enable(\TIDEWAYS_XHPROF_FLAGS_MEMORY | \TIDEWAYS_XHPROF_FLAGS_CPU);
     }
 
-    public function endTest(Test $test, $time)
+    public function endTest(Test $test, $time): void
     {
         if (!$test instanceof TestCase) {
             return;
