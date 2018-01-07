@@ -21,11 +21,6 @@ final class TestListener implements TestListenerInterface
     use TestListenerDefaultImplementation;
 
     /**
-     * @var ProfileCollection
-     */
-    private $profiles;
-
-    /**
      * @var string
      */
     private $targetDirectory;
@@ -36,6 +31,11 @@ final class TestListener implements TestListenerInterface
     private $testSuites = 0;
 
     /**
+     * @var int
+     */
+    private $tests = 0;
+
+    /**
      * @throws InvalidTargetDirectoryException
      * @throws TidewaysExtensionNotLoadedException
      */
@@ -44,8 +44,8 @@ final class TestListener implements TestListenerInterface
         $this->ensureTargetDirectoryIsWritable($targetDirectory);
         $this->ensureProfilerIsAvailable();
 
-        $this->targetDirectory = $targetDirectory;
-        $this->profiles        = new ProfileCollection;
+        $this->targetDirectory = \realpath($targetDirectory) . \DIRECTORY_SEPARATOR;
+        $this->filenamePrefix  = \uniqid('phpunit_tideways_');
     }
 
     public function startTestSuite(TestSuite $suite): void
@@ -58,9 +58,22 @@ final class TestListener implements TestListenerInterface
         $this->testSuites--;
 
         if ($this->testSuites === 0) {
+            $profiles = new ProfileCollection;
+
+            foreach (\glob($this->targetDirectory . $this->filenamePrefix . '*') as $fileName) {
+                $profiles->add(
+                    \unserialize(
+                        \file_get_contents($fileName),
+                        [ProfileCollection::class, Profile::class]
+                    )
+                );
+
+                \unlink($fileName);
+            }
+
             \file_put_contents(
-                $this->targetDirectory . \DIRECTORY_SEPARATOR . \uniqid('phpunit_tideways_'),
-                \serialize($this->profiles)
+                $this->targetDirectory . $this->filenamePrefix,
+                \serialize($profiles)
             );
         }
     }
@@ -80,12 +93,15 @@ final class TestListener implements TestListenerInterface
             return;
         }
 
-        $this->profiles->add(
-            new Profile(
-                \get_class($test),
-                $test->getName(false),
-                $test->dataDescription(),
-                \tideways_xhprof_disable()
+        \file_put_contents(
+            $this->profileFileName(),
+            \serialize(
+                new Profile(
+                    \get_class($test),
+                    $test->getName(false),
+                    $test->dataDescription(),
+                    \tideways_xhprof_disable()
+                )
             )
         );
     }
@@ -108,5 +124,15 @@ final class TestListener implements TestListenerInterface
         if (!@\mkdir($directory) && !\is_dir($directory)) {
             throw new InvalidTargetDirectoryException;
         }
+    }
+
+    private function profileFileName(): string
+    {
+        return \sprintf(
+            '%s%s_%010d',
+            $this->targetDirectory,
+            $this->filenamePrefix,
+            ++$this->tests
+        );
     }
 }
