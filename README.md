@@ -47,8 +47,8 @@ The following elements are relevant to this test listener and its configuration:
 * `<listeners>` is the configuration section for test listeners
 * `<listener>` configures (an instance of) the `PHPUnit\Tideways\TestListener` class as a test listener
 * `<arguments>` is the configuration for that test listener
-* The only argument is the path to the directory where the profile information is to be dumped, in this example `/tmp`
+* The only argument is the path to the directory where the profile information for each test is to be dumped, in this example `/tmp`
 
 The rest of the `phpunit.xml` example shown above are best practice configuration defaults that were generated using `phpunit --generate-configuration`.
 
-After the test suite has been executed, the test listener creates a file in the specified target directory that contains a `serialize()`d `ProfileCollection` object. This collection has a `Profile` object for each test that was executed. These `Profile` objects contain the raw profile information gathered by the `tideways_xhprof` extension as well as metadata on the test.
+For each test that was run there will be a `.json` file in the specified directory. These file contain the `json_encode()`d profiling data returned by the `tideways_xhprof` extension.
