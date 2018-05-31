@@ -1,6 +1,6 @@
 # phpunit-tideways-listener
 
-Test Listener for [PHPUnit](https://github.com/sebastianbergmann/phpunit/) that uses the [tideways_xhprof](https://github.com/tideways/php-profiler-extension) extension to dump memory profile information.
+Test Listener for [PHPUnit](https://github.com/sebastianbergmann/phpunit/) that uses [Tideways](https://tideways.com/)' [profiler](https://github.com/tideways/php-xhprof-extension) extension for PHP 7 to dump profiling information.
 
 ## Installation
 
@@ -15,16 +15,18 @@ The example below shows how you activate and configure this test listener in you
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.5/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/7.2/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          forceCoversAnnotation="true"
          beStrictAboutCoversAnnotation="true"
          beStrictAboutOutputDuringTests="true"
          beStrictAboutTodoAnnotatedTests="true"
          verbose="true">
-    <testsuite>
-        <directory suffix="Test.php">tests</directory>
-    </testsuite>
+    <testsuites>
+        <testsuite name="default">
+            <directory suffix="Test.php">tests</directory>
+        </testsuite>
+    </testsuites>
 
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
@@ -51,4 +53,5 @@ The following elements are relevant to this test listener and its configuration:
 
 The rest of the `phpunit.xml` example shown above are best practice configuration defaults that were generated using `phpunit --generate-configuration`.
 
-For each test that was run there will be a `.json` file in the specified directory. These file contain the `json_encode()`d profiling data returned by the `tideways_xhprof` extension.
+For each test that was run there will be a `.json` file in the specified directory. These file contain the `json_encode()`d profiling data returned by the profiler extension.
+
