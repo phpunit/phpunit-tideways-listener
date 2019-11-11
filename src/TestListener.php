@@ -7,18 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace PHPUnit\Tideways;
 
-use PHPUnit\Framework\Test;
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestListener as TestListenerInterface;
-use PHPUnit\Framework\TestListenerDefaultImplementation;
+use PHPUnit\Runner\AfterTestHook;
+use PHPUnit\Runner\BeforeTestHook;
 
-final class TestListener implements TestListenerInterface
+final class TestListener implements AfterTestHook, BeforeTestHook
 {
-    use TestListenerDefaultImplementation;
-
     /**
      * @var string
      */
@@ -36,21 +31,13 @@ final class TestListener implements TestListenerInterface
         $this->targetDirectory = \realpath($targetDirectory);
     }
 
-    public function startTest(Test $test): void
+    public function executeBeforeTest(string $test): void
     {
-        if (!$test instanceof TestCase) {
-            return;
-        }
-
         \tideways_xhprof_enable(\TIDEWAYS_XHPROF_FLAGS_MEMORY | \TIDEWAYS_XHPROF_FLAGS_CPU);
     }
 
-    public function endTest(Test $test, $time): void
+    public function executeAfterTest(string $test, float $time): void
     {
-        if (!$test instanceof TestCase) {
-            return;
-        }
-
         $data = \tideways_xhprof_disable();
 
         \file_put_contents($this->fileName($test), \json_encode($data));
@@ -76,14 +63,8 @@ final class TestListener implements TestListenerInterface
         }
     }
 
-    private function fileName(TestCase $test): string
+    private function fileName(string $test): string
     {
-        $id = \str_replace('\\', '_', \get_class($test)) . '::' . $test->getName(false);
-
-        if (!empty($test->dataDescription())) {
-            $id .= '#' . \str_replace(' ', '_', $test->dataDescription());
-        }
-
-        return $this->targetDirectory . \DIRECTORY_SEPARATOR . $id . '.json';
+        return $this->targetDirectory . \DIRECTORY_SEPARATOR . \str_replace(['\\', ' '], '_', $test) . '.json';
     }
 }
