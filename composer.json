@@ -16,7 +16,7 @@
     "php": "^7.1",
     "ext-json": "*",
     "ext-tideways_xhprof": "*",
-    "phpunit/phpunit": "^6"
+    "phpunit/phpunit": "^8.4"
   },
   "autoload": {
     "classmap": [
