@@ -15,8 +15,9 @@ The example below shows how you activate and configure this test listener in you
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/7.2/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/8.4/phpunit.xsd"
          bootstrap="vendor/autoload.php"
+         executionOrder="depends,defects"
          forceCoversAnnotation="true"
          beStrictAboutCoversAnnotation="true"
          beStrictAboutOutputDuringTests="true"
@@ -24,31 +25,31 @@ The example below shows how you activate and configure this test listener in you
          verbose="true">
     <testsuites>
         <testsuite name="default">
-            <directory suffix="Test.php">tests</directory>
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">src</directory>
+            <directory>src</directory>
         </whitelist>
     </filter>
 
-    <listeners>
-        <listener class="PHPUnit\Tideways\TestListener">
+    <extensions>
+        <extension class="PHPUnit\Tideways\TestListener">
             <arguments>
                 <string>/tmp</string>
             </arguments>
-        </listener>
-    </listeners>
+        </extension>
+    </extensions>
 </phpunit>
 ```
 
 The following elements are relevant to this test listener and its configuration:
 
-* `<listeners>` is the configuration section for test listeners
-* `<listener>` configures (an instance of) the `PHPUnit\Tideways\TestListener` class as a test listener
-* `<arguments>` is the configuration for that test listener
+* `<extensions>` is the configuration section for test runner extensions
+* `<extension>` configures (an instance of) the `PHPUnit\Tideways\TestListener` class as a test runner extension
+* `<arguments>` is the configuration for that test runner extension
 * The only argument is the path to the directory where the profile information for each test is to be dumped, in this example `/tmp`
 
 The rest of the `phpunit.xml` example shown above are best practice configuration defaults that were generated using `phpunit --generate-configuration`.
