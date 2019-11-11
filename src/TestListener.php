@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 /*
- * This file is part of the phpunit-tideways-listener.
+ * This file is part of phpunit/phpunit-tideways-listener.
  *
  * (c) Sebastian Bergmann <sebastian@phpunit.de>
  *
@@ -84,6 +84,6 @@ final class TestListener implements TestListenerInterface
             $id .= '#' . \str_replace(' ', '_', $test->dataDescription());
         }
 
-        return $this->targetDirectory . DIRECTORY_SEPARATOR . $id . '.json';
+        return $this->targetDirectory . \DIRECTORY_SEPARATOR . $id . '.json';
     }
 }
