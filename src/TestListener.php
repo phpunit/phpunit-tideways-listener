@@ -20,6 +20,11 @@ final class TestListener implements AfterTestHook, BeforeTestHook
     private $targetDirectory;
 
     /**
+     * @var array<string,int>
+     */
+    private $index = [];
+
+    /**
      * @throws InvalidTargetDirectoryException
      * @throws TidewaysExtensionNotLoadedException
      */
@@ -65,6 +70,18 @@ final class TestListener implements AfterTestHook, BeforeTestHook
 
     private function fileName(string $test): string
     {
-        return $this->targetDirectory . \DIRECTORY_SEPARATOR . \str_replace(['\\', ' '], '_', $test) . '.json';
+        if (\strpos($test, 'with data set') !== false) {
+            $test = \substr($test, 0, \strpos($test, 'with data set'));
+
+            if (!isset($this->index[$test])) {
+                $this->index[$test] = 1;
+            } else {
+                $this->index[$test]++;
+            }
+
+            $test .= '_' . $this->index[$test];
+        }
+
+        return $this->targetDirectory . \DIRECTORY_SEPARATOR . \str_replace(['\\', '::', ' '], '_', $test) . '.json';
     }
 }
